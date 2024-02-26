@@ -1,0 +1,39 @@
+{
+  "Convenio 1": [
+    {
+      "CodigoNovedad": "0002",
+      "NombreNovedad": "EPM",
+      "TipoNovedad": "novedad varia causada con saldo",
+      "FechaLimite": "2024-1-31",
+      "Cuota": "50000"
+    }
+  ],
+  "Convenio 2": [
+    {
+      "CodigoNovedad": "0003",
+      "NombreNovedad": "Seguros Bolivar",
+      "TipoNovedad": "novedad varia no causada con saldo",
+      "FechaLimite": "2024-2-31",
+      "Cuota": "60000"
+    }
+  ],
+  "Convenio 3": [
+    {
+      "CodigoNovedad": "0004",
+      "NombreNovedad": "Plan de datos",
+      "TipoNovedad": "novedad varia causada",
+      "FechaLimite": "2024-1-31",
+      "Cuota": "15000"
+    }
+  ],
+
+  "Convenio 4": [
+    {
+      "CodigoNovedad": "0005",
+      "NombreNovedad": "Gym",
+      "TipoNovedad": "novedad varia no causada",
+      "FechaLimite": "2024-2-24",
+      "Cuota": "5000"
+    }
+  ]
+}
