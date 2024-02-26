@@ -230,6 +230,7 @@ button:hover {
       this.shadowRoot.querySelector("#convenio").addEventListener("change", (e) => this.handleConvenioChange(e, data));
       this.shadowRoot.querySelector("#submit-button").addEventListener("click", (e) => this.handleSubmit(e, data));
     }
+    // Metodo para obtener los datos de los convenios
     async getData() {
       const url2 = "./data.json";
       try {
@@ -244,6 +245,7 @@ button:hover {
         this.showAlert("No se pudieron consultar los covenios", this.shadowRoot.getElementById("submit-button"));
       }
     }
+    // Metodo para agregar las opciones al select de convenios
     addOptions(data) {
       if (!data)
         return;

@@ -72,6 +72,8 @@ class FormNovedades extends HTMLElement {
     this.shadowRoot.querySelector('#submit-button').addEventListener('click', (e) => this.handleSubmit(e, data));
   }
 
+  // Metodo para obtener los datos de los convenios
+
   async getData() {
     const url = './data.json';
 
@@ -88,6 +90,8 @@ class FormNovedades extends HTMLElement {
       this.showAlert('No se pudieron consultar los covenios', this.shadowRoot.getElementById('submit-button'));
     }
   }
+
+  // Metodo para agregar las opciones al select de convenios
 
   addOptions(data) {
     
@@ -186,7 +190,6 @@ class FormNovedades extends HTMLElement {
         formaPago.insertAdjacentHTML('afterend', plazoSaldo);
       }
   }
-
 
   // Metodo para calcular el saldo total segun el plazo mensual y la cuota mensual, tambien se agrega la funcion para agregar comas a los numeros
 
