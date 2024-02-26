@@ -170,7 +170,11 @@ button:hover {
     }
     connectedCallback() {
       this.render();
-      this.configurarEventos();
+      document.addEventListener("obtenerData", (e) => {
+        const respuesta = e.detail;
+        this.addOptions(respuesta);
+        this.configurarEventos(respuesta);
+      });
     }
     render() {
       this.shadowRoot.innerHTML = `
@@ -178,7 +182,7 @@ button:hover {
         ${css}
       </style>
       
-      <form id="form-novedad">
+      <form id="form-novedad" onsubmit="this.handleSubmit">
 
       <h1>Crear Novedades</h1>
 
@@ -224,26 +228,10 @@ button:hover {
     `;
     }
     // Eventos que se ejecutan despues del renderizado del componente
-    async configurarEventos() {
-      const data = await this.getData();
-      this.addOptions(data);
+    async configurarEventos(respuesta) {
+      const data = respuesta;
       this.shadowRoot.querySelector("#convenio").addEventListener("change", (e) => this.handleConvenioChange(e, data));
-      this.shadowRoot.querySelector("#submit-button").addEventListener("click", (e) => this.handleSubmit(e, data));
-    }
-    // Metodo para obtener los datos de los convenios
-    async getData() {
-      const url2 = "./data.json";
-      try {
-        const respuesta = await fetch(url2);
-        const datos = await respuesta.json();
-        if (respuesta.ok) {
-          return datos;
-        } else {
-          throw new Error("Error en la peticion");
-        }
-      } catch (error) {
-        this.showAlert("No se pudieron consultar los covenios", this.shadowRoot.getElementById("submit-button"));
-      }
+      this.shadowRoot.querySelector("#form-novedad").addEventListener("submit", (e) => this.handleSubmit(e, data));
     }
     // Metodo para agregar las opciones al select de convenios
     addOptions(data) {
@@ -367,7 +355,7 @@ button:hover {
     // Metodo para enviar los datos del formulario
     handleSubmit(e, data) {
       e.preventDefault();
-      const submitButton2 = this.shadowRoot.getElementById("submit-button");
+      const submitButton = this.shadowRoot.getElementById("submit-button");
       const selectors = {
         convenio: this.shadowRoot.getElementById("convenio").value,
         cuotaMensual: this.shadowRoot.getElementById("cuotaMensual").value,
@@ -381,15 +369,15 @@ button:hover {
       const plazoMensual = selectors?.plazoMensual;
       const saldoTotal = selectors.saldoTotal?.replace(/[^0-9]/g, "");
       if ([convenio, cuotaMensual, formaPago, plazoMensual, saldoTotal].includes("")) {
-        this.showAlert("Todos los campos son requeridos", submitButton2);
+        this.showAlert("Todos los campos son requeridos", submitButton);
         return;
       }
       if (convenio === "0") {
-        this.showAlert("Por favor seleccione un convenio", submitButton2);
+        this.showAlert("Por favor seleccione un convenio", submitButton);
         return;
       }
       if (formaPago === "0") {
-        this.showAlert("Por favor seleccione una forma de pago", submitButton2);
+        this.showAlert("Por favor seleccione una forma de pago", submitButton);
         return;
       }
       const formData = {
@@ -397,10 +385,7 @@ button:hover {
         cuotaMensual,
         formaPago,
         plazoMensual,
-        saldoTotal,
-        documento: this.getAttribute("data-documento"),
-        url: this.getAttribute("data-url"),
-        ruta: this.getAttribute("data-ruta")
+        saldoTotal
       };
       Object.keys(data).forEach((key) => {
         if (key === this.shadowRoot.getElementById("convenio").value) {
@@ -413,26 +398,13 @@ button:hover {
             this.showAlert("La fecha limite para crear la novedad ya se cumplio.", this.shadowRoot.getElementById("submit-button"));
             return;
           } else {
-            console.log(JSON.stringify(formData));
+            const event = new CustomEvent("formularioSubmit", {
+              detail: formData
+            });
+            document.dispatchEvent(event);
           }
         }
       });
-    }
-    // Funcion que se conecta al servicio y manda una peticion de tipo POST con los datos del formulario
-    async sendData(formData) {
-      url = "https://jsonplaceholder.typicode.com/posts";
-      await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      }).then((response2) => response2.json());
-      if (response.ok) {
-        this.showAlert("Novedad creada con exito", submitButton);
-      } else {
-        this.showAlert("Error al crear la novedad", submitButton);
-      }
     }
     // Funcion para mostrar una alerta en el formulario
     showAlert(msg, targetElement) {

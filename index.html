@@ -4,9 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nueva Novedad</title>
-  <script src="/build/index.js"></script>
 </head>
 <body>
-  <form-novedades data-documento="1152468765" data-url="url-del-sitio-web" data-ruta="/nueva-novedad"></form-novedades>
+  <script src="build/index.js"></script>
+  
+  <form-novedades id="form-novedades"></form-novedades>
+  
+  //Ejemplo de como usar los llamados a los servicios
+
+  <script>
+    const getData = async () => {
+      const url = './data.json'
+      fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const event = new CustomEvent('obtenerData', {detail: data})
+        document.dispatchEvent(event)
+      }).catch(error => {
+        console.error('Error:', error)
+      })
+    }
+    
+    getData()
+
+    document.addEventListener('formularioSubmit', (e) => {
+      const datosFormulario = event.detail;
+      console.log('Datos del formulario:', datosFormulario);
+    })
+  </script>
+
+
 </body>
 </html>

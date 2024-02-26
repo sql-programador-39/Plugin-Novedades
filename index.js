@@ -1,4 +1,4 @@
-import { css } from './styles.css';
+import { css } from './styles.css.js';
 
 class FormNovedades extends HTMLElement {
   constructor() {
@@ -8,7 +8,11 @@ class FormNovedades extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.configurarEventos();
+    document.addEventListener('obtenerData', e => {
+      const respuesta = e.detail;
+      this.addOptions(respuesta);
+      this.configurarEventos(respuesta);
+    });
   }
 
   render() {
@@ -17,7 +21,7 @@ class FormNovedades extends HTMLElement {
         ${css}
       </style>
       
-      <form id="form-novedad">
+      <form id="form-novedad" onsubmit="this.handleSubmit">
 
       <h1>Crear Novedades</h1>
 
@@ -65,30 +69,10 @@ class FormNovedades extends HTMLElement {
 
   // Eventos que se ejecutan despues del renderizado del componente
 
-  async configurarEventos() {
-    const data = await this.getData();
-    this.addOptions(data);
+  async configurarEventos(respuesta) {
+    const data = respuesta;
     this.shadowRoot.querySelector('#convenio').addEventListener('change', (e) => this.handleConvenioChange(e, data));
-    this.shadowRoot.querySelector('#submit-button').addEventListener('click', (e) => this.handleSubmit(e, data));
-  }
-
-  // Metodo para obtener los datos de los convenios
-
-  async getData() {
-    const url = './data.json';
-
-    try {
-      const respuesta = await fetch(url);
-      const datos = await respuesta.json();   
-      
-      if(respuesta.ok) {
-        return datos;
-      } else {
-        throw new Error('Error en la peticion');
-      }
-    } catch (error) {
-      this.showAlert('No se pudieron consultar los covenios', this.shadowRoot.getElementById('submit-button'));
-    }
+    this.shadowRoot.querySelector('#form-novedad').addEventListener('submit', (e) => this.handleSubmit(e, data));
   }
 
   // Metodo para agregar las opciones al select de convenios
@@ -286,13 +270,11 @@ class FormNovedades extends HTMLElement {
       cuotaMensual,
       formaPago,
       plazoMensual,
-      saldoTotal,
-      documento: this.getAttribute('data-documento'),
-      url: this.getAttribute('data-url'),
-      ruta: this.getAttribute('data-ruta')
+      saldoTotal
     };
 
     // validar fecha limite para crear la novedad
+
     Object.keys(data).forEach(key => {
       if(key === this.shadowRoot.getElementById('convenio').value) {
         const fechaLimite = data[key][0].FechaLimite;
@@ -305,32 +287,13 @@ class FormNovedades extends HTMLElement {
           this.showAlert('La fecha limite para crear la novedad ya se cumplio.', this.shadowRoot.getElementById('submit-button'));
           return
         } else {
-          /* this.sendData(formData) */
-          console.log(JSON.stringify(formData));
+          const event = new CustomEvent('formularioSubmit', {
+            detail: formData
+          });
+          document.dispatchEvent(event);
         }
       }
     });
-  }
-
-  // Funcion que se conecta al servicio y manda una peticion de tipo POST con los datos del formulario
-
-  async sendData(formData) {
-    url = 'https://jsonplaceholder.typicode.com/posts';
-
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(formData),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    })
-    .then(response => response.json())
-    
-    if(response.ok) {
-      this.showAlert('Novedad creada con exito', submitButton);
-    } else {
-      this.showAlert('Error al crear la novedad', submitButton);
-    }
   }
 
   // Funcion para mostrar una alerta en el formulario
